@@ -7,16 +7,16 @@ from train_and_test import train_model, test_model
 
 def create_config():
     config = {
-        "batch_size": 16,
-        "input_shape": (3, 128, 128),
-        "architecture": "UNet",
+        "batch_size": 128,
+        # "architecture": "UNet",
+        "architecture": "FC",
         "hidden_dims": [64, 128, 256, 512],
-        "epochs": 2,
+        "epochs": 100,
         "learning_rate": 0.001,
         "dataset_dir": "/Users/rotem.green/.cache/kagglehub/datasets/rajat95gupta/smartphone-image-denoising-dataset/versions/1/SIDD_Small_sRGB_Only",
         "crop_size": 128,
         "output_dir": "./q3_models/exp1",
-    }   
+    }    
     return config
 
 def setup_logging(output_dir):

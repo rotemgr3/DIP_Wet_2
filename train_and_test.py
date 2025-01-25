@@ -26,7 +26,6 @@ def train_one_epoch(model, dataloader, criterion, optimizer, device):
         # Compute PSNR for batch
         for i in range(noisy.size(0)):
             psnrs.append(compute_psnr(clean[i].detach().cpu().numpy(), outputs[i].detach().cpu().numpy()))
-        break
     avg_psnr = sum(psnrs) / len(psnrs)
     return running_loss / len(dataloader), avg_psnr
 
@@ -42,7 +41,6 @@ def evaluate_model(model, dataloader, criterion, device):
             running_loss += loss.item()
             for i in range(noisy.size(0)):
                 psnrs.append(compute_psnr(clean[i].cpu().numpy(), outputs[i].cpu().numpy()))
-            break
     avg_psnr = sum(psnrs) / len(psnrs)
     return running_loss / len(dataloader), avg_psnr
 

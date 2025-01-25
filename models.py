@@ -3,18 +3,18 @@ import torch.nn as nn
 
 def get_model(config):
     if config["architecture"] == "FC":
-        return FullyConnectedDenoiser(config["input_shape"], config["hidden_dims"])
+        return FullyConnectedDenoiser(config["crop_size"], config["hidden_dims"])
     elif config["architecture"] == "UNet":
-        return UNetDenoiser(config["input_shape"], config["hidden_dims"])
+        return UNetDenoiser(config["crop_size"], config["hidden_dims"])
     else:
         raise ValueError(f"Invalid architecture: {config['architecture']}")
 
 
 class FullyConnectedDenoiser(nn.Module):
-    def __init__(self, input_shape, hidden_dims):
+    def __init__(self, crop_size, hidden_dims):
         super(FullyConnectedDenoiser, self).__init__()
-        self.input_shape = input_shape
-        input_dim = input_shape[0] * input_shape[1] * input_shape[2]
+        self.input_shape = (3, crop_size, crop_size)
+        input_dim = self.input_shape[0] * self.input_shape[1] * self.input_shape[2]
         layers = []
         dims = [input_dim] + hidden_dims
         for i in range(len(dims) - 1):
@@ -81,11 +81,11 @@ class DecoderBlock(nn.Module):
         return x
 
 class UNetDenoiser(nn.Module):
-    def __init__(self, input_shape, hidden_dims, kernel_size=3):
+    def __init__(self, crop_size, hidden_dims, kernel_size=3):
         super(UNetDenoiser, self).__init__()
         
-        self.input_shape = input_shape
-        self.in_channels = input_shape[0]
+        self.input_shape = (3, crop_size, crop_size)
+        self.in_channels = self.input_shape[0]
         self.hidden_dims = hidden_dims
         self.kernel_size = kernel_size
 
