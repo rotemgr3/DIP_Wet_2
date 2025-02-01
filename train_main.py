@@ -13,6 +13,7 @@ def create_config():
         # "architecture": "FC",
         # Input and output dims are 128*128*3 = 49152 so need to create some bottlenech
         "hidden_dims": [1000, 800, 1000],
+        # "hidden_dims": [64, 128, 256, 512],
         "epochs": 100,
         "learning_rate": 0.001,
         "dataset_dir": "../SIDD_Small_sRGB_Only",  # the dir that contains the data dir
@@ -28,7 +29,8 @@ def setup_logging(output_dir):
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s - %(levelname)s - %(message)s",
-        handlers=[logging.FileHandler(log_file), logging.StreamHandler(sys.stdout)],
+        handlers=[logging.FileHandler(
+            log_file), logging.StreamHandler(sys.stdout)],
     )
     # If file exists, flush it and start over
     open(log_file, "w").close()
