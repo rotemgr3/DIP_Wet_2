@@ -17,7 +17,8 @@ def train_one_epoch(model, dataloader, criterion, optimizer, device):
     running_loss = 0.0
     psnrs = []
     for noisy, clean in tqdm(dataloader, desc="Training"):
-        noisy, clean = noisy.to(device), clean.to(device)
+        noisy = noisy.to(device, dtype=torch.float32) / 255.0
+        clean = clean.to(device, dtype=torch.float32) / 255.0
         optimizer.zero_grad()
         outputs = model(noisy)
         loss = criterion(outputs, clean)
@@ -28,7 +29,8 @@ def train_one_epoch(model, dataloader, criterion, optimizer, device):
         for i in range(noisy.size(0)):
             psnrs.append(
                 compute_psnr(
-                    clean[i].detach().cpu().numpy(), outputs[i].detach().cpu().numpy()
+                    clean[i].detach().cpu().numpy(
+                    ), outputs[i].detach().cpu().numpy()
                 )
             )
     avg_psnr = sum(psnrs) / len(psnrs)
@@ -41,13 +43,15 @@ def evaluate_model(model, dataloader, criterion, device):
     psnrs = []
     with torch.no_grad():
         for noisy, clean in tqdm(dataloader, desc="Evaluating"):
-            noisy, clean = noisy.to(device), clean.to(device)
+            noisy = noisy.to(device, dtype=torch.float32) / 255.0
+            clean = clean.to(device, dtype=torch.float32) / 255.0
             outputs = model(noisy)
             loss = criterion(outputs, clean)
             running_loss += loss.item()
             for i in range(noisy.size(0)):
                 psnrs.append(
-                    compute_psnr(clean[i].cpu().numpy(), outputs[i].cpu().numpy())
+                    compute_psnr(clean[i].cpu().numpy(),
+                                 outputs[i].cpu().numpy())
                 )
     avg_psnr = sum(psnrs) / len(psnrs)
     return running_loss / len(dataloader), avg_psnr
@@ -66,10 +70,10 @@ def train_model(config):
         config["dataset_dir"], crop_size=config["crop_size"], mode="val"
     )
     train_dataloader = DataLoader(
-        train_dataset, batch_size=config["batch_size"], shuffle=True
+        train_dataset, batch_size=config["batch_size"], shuffle=True, num_workers=4, pin_memory=True
     )
     val_dataloader = DataLoader(
-        val_dataset, batch_size=config["batch_size"], shuffle=False
+        val_dataset, batch_size=config["batch_size"], shuffle=False, num_workers=4, pin_memory=True
     )
 
     print("Train dataset size:", len(train_dataset))
@@ -78,7 +82,8 @@ def train_model(config):
     # Initialize model, loss, and optimizer
     model = get_model(config).to(manager.device)
     num_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
-    print(f"Model architecture:\n{model}, \n\nNumber of parameters: {num_params:,}")
+    print(
+        f"Model architecture:\n{model}, \n\nNumber of parameters: {num_params:,}")
     criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=config["learning_rate"])
 
@@ -146,7 +151,7 @@ def test_model(config):
         config["dataset_dir"], crop_size=config["crop_size"], mode="test"
     )
     test_dataloader = DataLoader(
-        test_dataset, batch_size=config["batch_size"], shuffle=False
+        test_dataset, batch_size=config["batch_size"], shuffle=False, num_workers=4, pin_memory=True
     )
 
     print("Test dataset size:", len(test_dataset))
