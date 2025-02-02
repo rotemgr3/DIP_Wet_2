@@ -104,11 +104,13 @@ class SIDD_Dataset(Dataset):
         # Determine fixed block positions
         h, w, _ = noisy.shape
         crop_size = self.crop_size
+        # Get all 4 middle blocks with crop size
+        img_center = (h // 2, w // 2)
         positions = [
-            (0, 0),  # Top-left
-            (0, w - crop_size),  # Top-right
-            (h - crop_size, 0),  # Bottom-left
-            (h - crop_size, w - crop_size),  # Bottom-right
+            (img_center[0] - crop_size, img_center[1] - crop_size),
+            (img_center[0] - crop_size, img_center[1]),
+            (img_center[0], img_center[1] - crop_size),
+            (img_center[0], img_center[1]),
         ]
         y, x = positions[block_idx]
 

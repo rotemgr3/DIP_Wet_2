@@ -113,8 +113,7 @@ def train_model(config):
         val_psnr_list.append(val_psnr)
 
         print(
-            f"Epoch {epoch + 1}: Train Loss = {train_loss:.4f}, Val Loss = {
-                val_loss:.4f}, Train PSNR = {train_psnr:.2f} dB, Val PSNR = {val_psnr:.2f} dB"
+            f"Epoch {epoch + 1}: Train Loss = {train_loss:.4f}, Val Loss = {val_loss:.4f}, Train PSNR = {train_psnr:.2f} dB, Val PSNR = {val_psnr:.2f} dB"
         )
 
         # Save model only if validation loss has decreased
@@ -182,4 +181,4 @@ def test_model(config):
         {"test_loss": test_loss, "test_psnr": test_psnr},
         os.path.join(config["output_dir"], "test_metrics.json"),
     )
-    manager.save_examples(test_dataloader, model, mode="test")
+    manager.save_examples(test_dataloader, model, mode="test", num_examples=25)

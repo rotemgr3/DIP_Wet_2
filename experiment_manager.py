@@ -9,8 +9,9 @@ class ExperimentManager:
         self.config = config
         self.output_dir = config['output_dir']
         os.makedirs(self.output_dir, exist_ok=True)
+        gpu = config['gpu'] if 'gpu' in config else 0
         self.device = torch.device(
-            "cuda" if torch.cuda.is_available() else "cpu")
+            f"cuda:{gpu}" if torch.cuda.is_available() else "cpu")
         print("Using device:", self.device)
         print("Experiment output directory:", self.output_dir)
 
@@ -60,29 +61,32 @@ class ExperimentManager:
         example_dir = os.path.join(self.output_dir, f"{mode}_examples")
         os.makedirs(example_dir, exist_ok=True)
         with torch.no_grad():
-            for i, (noisy, clean) in enumerate(dataloader):
-                if i >= num_examples:
-                    break
+            for noisy, clean in dataloader:
                 noisy = noisy.to(self.device, dtype=torch.float32) / 255.0
                 clean = clean.to(self.device, dtype=torch.float32) / 255.0
                 outputs = model(noisy)
-                noisy_np = noisy.cpu().numpy()[0].transpose(1, 2, 0)
-                clean_np = clean.cpu().numpy()[0].transpose(1, 2, 0)
-                output_np = outputs.cpu().numpy()[0].transpose(1, 2, 0)
+                for i in range(len(outputs)):
+                    if i >= num_examples:
+                        break
+                    noisy_np = noisy.cpu().numpy()[i].transpose(1, 2, 0)
+                    clean_np = clean.cpu().numpy()[i].transpose(1, 2, 0)
+                    output_np = outputs.cpu().numpy()[i].transpose(1, 2, 0)
 
-                plt.figure(figsize=(15, 5))
-                plt.subplot(1, 3, 1)
-                plt.imshow(noisy_np)
-                plt.title("Noisy Input")
-                plt.subplot(1, 3, 2)
-                plt.imshow(clean_np)
-                plt.title("Clean Target")
-                plt.subplot(1, 3, 3)
-                plt.imshow(output_np)
-                plt.title("Denoised Output")
-                plt.tight_layout()
-                plt.savefig(os.path.join(example_dir, f"example_{i}.png"))
-                plt.close()
+                    plt.figure(figsize=(15, 5))
+                    plt.subplot(1, 3, 1)
+                    plt.imshow(noisy_np)
+                    plt.title("Noisy Input")
+                    plt.subplot(1, 3, 2)
+                    plt.imshow(clean_np)
+                    plt.title("Clean Target")
+                    plt.subplot(1, 3, 3)
+                    plt.imshow(output_np)
+                    plt.title("Denoised Output")
+                    plt.tight_layout()
+                    plt.savefig(os.path.join(example_dir, f"example_{i}.png"))
+                    plt.close()
+
+                    i += 1
         print(f"Saved {mode} examples to {example_dir}")
 
     def save_metrics(self, metrics_dict, metrics_path):
