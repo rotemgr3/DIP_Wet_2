@@ -9,7 +9,8 @@ class ExperimentManager:
         self.config = config
         self.output_dir = config['output_dir']
         os.makedirs(self.output_dir, exist_ok=True)
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device(
+            "cuda" if torch.cuda.is_available() else "cpu")
         print("Using device:", self.device)
         print("Experiment output directory:", self.output_dir)
 
@@ -20,7 +21,8 @@ class ExperimentManager:
         print("Saved config to", config_path)
 
     def save_model(self, model, epoch):
-        model_path = os.path.join(self.output_dir, "models", f"model_epoch_{epoch}.pth")
+        model_path = os.path.join(
+            self.output_dir, "models", f"model_epoch_{epoch}.pth")
         os.makedirs(os.path.join(self.output_dir, "models"), exist_ok=True)
         torch.save(model.state_dict(), model_path)
         print(f"Saved model weights to {model_path}")
@@ -38,7 +40,7 @@ class ExperimentManager:
         plt.savefig(plot_path)
         plt.close()
         print(f"Saved loss plot to {plot_path}")
-    
+
     def save_psnr_plot(self, train_psnr, val_psnr):
         plt.figure(figsize=(10, 6))
         plt.plot(train_psnr, label='Train PSNR')
@@ -61,7 +63,8 @@ class ExperimentManager:
             for i, (noisy, clean) in enumerate(dataloader):
                 if i >= num_examples:
                     break
-                noisy, clean = noisy.to(self.device), clean.to(self.device)
+                noisy = noisy.to(self.device, dtype=torch.float32) / 255.0
+                clean = clean.to(self.device, dtype=torch.float32) / 255.0
                 outputs = model(noisy)
                 noisy_np = noisy.cpu().numpy()[0].transpose(1, 2, 0)
                 clean_np = clean.cpu().numpy()[0].transpose(1, 2, 0)

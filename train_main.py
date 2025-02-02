@@ -9,16 +9,17 @@ from train_and_test import test_model, train_model
 def create_config():
     config = {
         "batch_size": 32,
-        "architecture": "UNet",
-        # "architecture": "FC",
+        # "architecture": "UNet",
+        "architecture": "FC",
         # Input and output dims are 128*128*3 = 49152 so need to create some bottlenech
         "hidden_dims": [1000, 800, 1000],
         # "hidden_dims": [64, 128, 256, 512],
         "epochs": 100,
         "learning_rate": 0.001,
-        "dataset_dir": "../SIDD_Small_sRGB_Only",  # the dir that contains the data dir
+        # the dir that contains the data dir
+        "dataset_dir": "/Users/rotem.green/.cache/kagglehub/datasets/rajat95gupta/smartphone-image-denoising-dataset/versions/1/SIDD_Small_sRGB_Only",
         "crop_size": 128,
-        "output_dir": "./q3_models/exp2",
+        "output_dir": "./q2_models/exp2",
     }
     return config
 
@@ -44,7 +45,7 @@ def setup_logging(output_dir):
 
 def main():
     config = create_config()
-    setup_logging(config["output_dir"])
+    # setup_logging(config["output_dir"])
     train_model(config)
     test_model(config)
 

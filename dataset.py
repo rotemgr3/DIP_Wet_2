@@ -37,8 +37,6 @@ class SIDD_Dataset(Dataset):
 
         # Precompute index mapping
         self.index_map = self._precompute_index_map()
-        # Cache images to avoid reading from disk
-        self.image_cache = {}
         # Prefetch images
         self._prefetch()
 
@@ -72,16 +70,11 @@ class SIDD_Dataset(Dataset):
             self.scence_cache[instance] = (noisy, clean)
 
     def __getitem__(self, idx):
-        if idx in self.image_cache:
-            return self.image_cache[idx]
         instance_idx, block_idx = self.index_map[idx]
         instance_dir = self.scene_instances[instance_idx]
         if self.mode == "test" or self.mode == "val":
-            imgs = self._get_fixed_block(instance_dir, block_idx)
-        else:
-            imgs = self._get_block(instance_dir, block_idx)
-        self.image_cache[idx] = imgs
-        return imgs
+            return self._get_fixed_block(instance_dir, block_idx)
+        return self._get_block(instance_dir, block_idx)
 
     def _get_block(self, instance_dir, block_idx):
         noisy, clean = self.scence_cache[instance_dir]

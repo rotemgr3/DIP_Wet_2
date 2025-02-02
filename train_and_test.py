@@ -70,10 +70,10 @@ def train_model(config):
         config["dataset_dir"], crop_size=config["crop_size"], mode="val"
     )
     train_dataloader = DataLoader(
-        train_dataset, batch_size=config["batch_size"], shuffle=True, num_workers=4, pin_memory=True
+        train_dataset, batch_size=config["batch_size"], shuffle=True, num_workers=0, pin_memory=False
     )
     val_dataloader = DataLoader(
-        val_dataset, batch_size=config["batch_size"], shuffle=False, num_workers=4, pin_memory=True
+        val_dataset, batch_size=config["batch_size"], shuffle=False, num_workers=0, pin_memory=False
     )
 
     print("Train dataset size:", len(train_dataset))
@@ -113,7 +113,8 @@ def train_model(config):
         val_psnr_list.append(val_psnr)
 
         print(
-            f"Epoch {epoch + 1}: Train Loss = {train_loss:.4f}, Val Loss = {val_loss:.4f}, Train PSNR = {train_psnr:.2f} dB, Val PSNR = {val_psnr:.2f} dB"
+            f"Epoch {epoch + 1}: Train Loss = {train_loss:.4f}, Val Loss = {
+                val_loss:.4f}, Train PSNR = {train_psnr:.2f} dB, Val PSNR = {val_psnr:.2f} dB"
         )
 
         # Save model only if validation loss has decreased
@@ -151,7 +152,7 @@ def test_model(config):
         config["dataset_dir"], crop_size=config["crop_size"], mode="test"
     )
     test_dataloader = DataLoader(
-        test_dataset, batch_size=config["batch_size"], shuffle=False, num_workers=4, pin_memory=True
+        test_dataset, batch_size=config["batch_size"], shuffle=False, num_workers=0, pin_memory=True
     )
 
     print("Test dataset size:", len(test_dataset))
