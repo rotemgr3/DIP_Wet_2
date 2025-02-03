@@ -18,8 +18,8 @@ def create_config():
         "learning_rate": 0.001,
         "dataset_dir": "/home/priel.hazan/.cache/kagglehub/datasets/rajat95gupta/smartphone-image-denoising-dataset/versions/1/SIDD_Small_sRGB_Only",
         "crop_size": 128,
-        # "output_dir": "./q2_models/exp1",
-        "output_dir": "./q3_models/exp1",
+        # "output_dir": "./q2_models/exp2",
+        "output_dir": "./q3_models/exp2",
     }
     return config
 
