@@ -67,7 +67,8 @@ class ExperimentManager:
                 outputs = model(noisy)
                 for i in range(len(outputs)):
                     if i >= num_examples:
-                        break
+                        print(f"Saved {mode} examples to {example_dir}")
+                        return
                     noisy_np = noisy.cpu().numpy()[i].transpose(1, 2, 0)
                     clean_np = clean.cpu().numpy()[i].transpose(1, 2, 0)
                     output_np = outputs.cpu().numpy()[i].transpose(1, 2, 0)
@@ -87,7 +88,6 @@ class ExperimentManager:
                     plt.close()
 
                     i += 1
-        print(f"Saved {mode} examples to {example_dir}")
 
     def save_metrics(self, metrics_dict, metrics_path):
         with open(metrics_path, "w") as f:
